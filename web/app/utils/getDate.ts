@@ -1,26 +1,13 @@
-export const getDate = (hexTimestamp: string | null): string => {
-  if (!hexTimestamp) return "No deadline";
-
-  try {
-    // Parse hex as BigInt
-    const timestamp = BigInt(hexTimestamp);
-
-    // Convert from ms to s if needed
-    const adjusted = timestamp > 9999999999n ? timestamp / 1000n : timestamp;
-
-    // Convert BigInt to Number safely (if within range)
-    if (adjusted > BigInt(Number.MAX_SAFE_INTEGER)) {
-      return "Date too far in future";
+export const getDate = (unixTime: number | null): string => {
+    if (unixTime === null) {
+        return '';
     }
 
-    const date = new Date(Number(adjusted) * 1000);
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(date.getUTCDate()).padStart(2, "0");
+    const date = new Date(unixTime * 1000);
 
-    return `${year}-${month}-${day}`;
-  } catch (err) {
-    console.error("❌ Failed to parse hex timestamp:", hexTimestamp, err);
-    return "Invalid date";
-  }
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-based
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
 };

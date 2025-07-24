@@ -1,15 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Star, Trophy, Zap } from "lucide-react";
+import { Star, Trophy, Zap, Calendar } from "lucide-react";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useRouter } from "next/router";
 
 function CreateNft({data} : {data: any}) {
     const [name, setName] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const wallet = useAnchorWallet();
-
-    console.log(wallet);
 
     const handleSubmit = async () => {
         if (!data || !data.url || !data.timestamp  || !data.score || !name) {
@@ -28,13 +28,12 @@ function CreateNft({data} : {data: any}) {
             ],
             user: wallet?.publicKey.toBase58() || "",
         };
-        console.log('Creating NFT with body:', body);
 
         try {
             const response = await axios.post('/api/nft/mint', body); 
 
             if (response.data.success) {
-                toast.success(`NFT created successfully! Mint Address: ${response.data.mint}`);
+                toast.success(`NFT created successfully`);
                 console.log('NFT Minted:', response.data);
             } else {
                 toast.error(`Failed to create NFT: ${response.data.error}`);
@@ -48,86 +47,70 @@ function CreateNft({data} : {data: any}) {
     }
 
     const getScoreColor = (score: number) => {
-        if (score < 20) return 'text-slate-400';
-        if (score < 40) return 'text-cyan-400';
-        if (score < 60) return 'text-blue-400';
-        if (score < 80) return 'text-purple-400';
-        return 'text-pink-400';
+        if (score < 20) return 'text-purple-300';
+        if (score < 40) return 'text-purple-400';
+        if (score < 60) return 'text-purple-500';
+        if (score < 80) return 'text-purple-600';
+        return 'text-purple-300';
     };
 
-    const getScoreGradient = (score: number) => {
-        if (score < 20) return 'from-slate-500/20 to-slate-600/20';
-        if (score < 40) return 'from-cyan-500/20 to-blue-500/20';
-        if (score < 60) return 'from-blue-500/20 to-purple-500/20';
-        if (score < 80) return 'from-purple-500/20 to-pink-500/20';
-        return 'from-pink-500/20 to-yellow-500/20';
+    const getScoreIcon = (score: number) => {
+        if (score < 20) return '😐';
+        if (score < 40) return '🙂';
+        if (score < 60) return '😊';
+        if (score < 80) return '😄';
+        return '🤩';
     };
 
     return (
-        <div className="w-1/2 space-y-6">
-            {/* Header */}
-            <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-2xl blur" />
-                <div className="relative p-6 bg-slate-800/90 backdrop-blur-xl rounded-2xl border border-purple-500/30">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-purple-500/20 rounded-lg">
-                            <Star className="w-6 h-6 text-purple-400" />
-                        </div>
-                        <div>
-                            <h2 className="text-2xl font-bold text-white">Mint Your Smile NFT</h2>
-                            <p className="text-slate-300">Turn your smile into a unique digital collectible</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <div className="w-full mx-auto">
+            <div className='flex justify-between p-6'>
+                          <h1 className='relative z-10'>Create NFT</h1>
+                          <WalletMultiButton/>
+                      </div>
             {/* Preview Section */}
-            <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-800/40 to-slate-700/40 rounded-3xl blur-xl" />
-                <div className="relative bg-slate-800/40 backdrop-blur-2xl rounded-3xl p-8 border border-slate-700/50">
-                    <div className="flex gap-6">
-                        {/* Image Preview */}
-                        <div className="flex-shrink-0">
-                            <div className="relative">
-                                <div className={`absolute inset-0 bg-gradient-to-r ${getScoreGradient(data?.score || 0)} rounded-2xl blur`} />
-                                <div className="relative p-2 bg-slate-800/50 backdrop-blur rounded-2xl border border-slate-600/50">
-                                    <img 
-                                        src={data?.url} 
-                                        alt="Smile Capture" 
-                                        className="w-32 h-32 rounded-xl object-cover"
-                                    />
-                                </div>
+            <div className="bg-purple-900/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-6">
+                <div className="flex gap-6 items-start">
+                    {/* Image Preview */}
+                    <div className="flex-shrink-0">
+                        <div className="relative">
+                            <img 
+                                src={data?.url} 
+                                alt="Smile Capture" 
+                                className="w-32 h-32 rounded-xl object-cover border border-purple-400/30"
+                            />
+                            <div className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                                {getScoreIcon(data?.score || 0)} {data?.score.toFixed(2) || 0}%
                             </div>
                         </div>
+                    </div>
 
-                        {/* Stats */}
-                        <div className="flex-1 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl blur" />
-                                    <div className="relative p-4 bg-slate-700/30 backdrop-blur rounded-xl border border-slate-600/30">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Trophy className="w-4 h-4 text-blue-400" />
-                                            <span className="text-sm text-slate-300 font-medium">Smile Score</span>
-                                        </div>
-                                        <span className={`text-xl font-bold ${getScoreColor(data?.score || 0)}`}>
-                                            {data?.score || 0}%
-                                        </span>
-                                    </div>
-                                </div>
+                    {/* Stats */}
+                    <div className="flex-1 space-y-4">
+                        <div>
+                            <h3 className="text-xl font-bold text-white mb-2">Your Smile NFT</h3>
+                            <p className="text-purple-200 text-sm">Ready to mint your unique smile as an NFT</p>
+                        </div>
 
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl blur" />
-                                    <div className="relative p-4 bg-slate-700/30 backdrop-blur rounded-xl border border-slate-600/30">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Zap className="w-4 h-4 text-green-400" />
-                                            <span className="text-sm text-slate-300 font-medium">Captured</span>
-                                        </div>
-                                        <span className="text-sm text-white font-medium">
-                                            {data?.timestamp ? new Date(data.timestamp).toLocaleDateString() : 'N/A'}
-                                        </span>
-                                    </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-purple-800/30 backdrop-blur-sm border border-purple-400/30 rounded-xl p-3">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Trophy className="w-4 h-4 text-purple-300" />
+                                    <span className="text-xs text-purple-200 font-medium">Smile Score</span>
                                 </div>
+                                <span className={`text-lg font-bold ${getScoreColor(data?.score || 0)}`}>
+                                    {data?.score || 0}%
+                                </span>
+                            </div>
+
+                            <div className="bg-purple-800/30 backdrop-blur-sm border border-purple-400/30 rounded-xl p-3">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Calendar className="w-4 h-4 text-purple-300" />
+                                    <span className="text-xs text-purple-200 font-medium">Captured</span>
+                                </div>
+                                <span className="text-sm text-white font-medium">
+                                    {data?.timestamp ? new Date(data.timestamp).toLocaleDateString() : 'N/A'}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -135,57 +118,48 @@ function CreateNft({data} : {data: any}) {
             </div>
 
             {/* Input Section */}
-            <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-800/40 to-slate-700/40 rounded-3xl blur-xl" />
-                <div className="relative bg-slate-800/40 backdrop-blur-2xl rounded-3xl p-8 border border-slate-700/50 space-y-6">
-                    <div>
-                        <label htmlFor="name" className="block text-lg font-medium text-white mb-3">
-                            NFT Name
-                        </label>
-                        <div className="relative">
-                            <input 
-                                type="text" 
-                                id="name" 
-                                value={name} 
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Enter a name for your smile NFT..."
-                                className="w-full px-6 py-4 bg-slate-700/50 backdrop-blur border border-slate-600/50 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Create Button */}
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isLoading || !name || !data?.url}
-                        className="relative w-full py-4 px-8 bg-gradient-to-r from-purple-500/90 to-pink-500/90 hover:from-purple-400 hover:to-pink-400 rounded-2xl font-bold text-xl text-white transition-all duration-500 shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <div className="relative flex items-center justify-center gap-4">
-                            {isLoading ? (
-                                <>
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Minting NFT...
-                                </>
-                            ) : (
-                                <>
-                                    <Star className="w-5 h-5" />
-                                    Create Smile NFT
-                                </>
-                            )}
-                        </div>
-                    </button>
-
-                    {data?.hash && (
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl blur" />
-                            <div className="relative p-4 bg-slate-700/30 backdrop-blur rounded-xl border border-green-500/30">
-                                <p className="text-sm text-green-400 font-medium mb-1">Transaction Hash:</p>
-                                <p className="text-xs text-slate-300 font-mono break-all">{data.hash}</p>
-                            </div>
-                        </div>
-                    )}
+            <div className="bg-purple-900/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-6 space-y-4">
+                <div>
+                    <label htmlFor="name" className="block text-lg font-semibold text-white mb-3">
+                        NFT Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter a name for your smile NFT..."
+                        className="w-full px-4 py-3 bg-purple-800/30 backdrop-blur-sm border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400 transition-all duration-300"
+                    />
                 </div>
+
+                {/* Create Button */}
+                <button
+                    onClick={handleSubmit}
+                    disabled={isLoading || !name || !data?.url}
+                    className="w-full py-4 px-6 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800/50 disabled:text-purple-400 rounded-xl font-semibold text-lg text-white transition-all duration-300 transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed"
+                >
+                    <div className="flex items-center justify-center gap-3">
+                        {isLoading ? (
+                            <>
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Minting NFT...
+                            </>
+                        ) : (
+                            <>
+                                <Star className="w-5 h-5" />
+                                Create Smile NFT
+                            </>
+                        )}
+                    </div>
+                </button>
+
+                {data?.hash && (
+                    <div className="bg-green-900/20 backdrop-blur-sm border border-green-500/30 rounded-xl p-4">
+                        <p className="text-sm text-green-400 font-medium mb-1">Transaction Hash:</p>
+                        <p className="text-xs text-green-200 font-mono break-all">{data.hash}</p>
+                    </div>
+                )}
             </div>
         </div>
     );

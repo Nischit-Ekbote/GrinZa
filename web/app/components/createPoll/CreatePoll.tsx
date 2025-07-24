@@ -166,14 +166,6 @@ function CreatePoll() {
   return (
     <div className="min-h-screen bg-black p-6">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text mt-10 mb-4">
-          <h1 className="text-5xl text-white bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Create Poll
-          </h1>
-          <p className="text-purple-200 text-lg mt-2">Create a community poll using your NFT</p>
-        </div>
-
         {/* Status Messages */}
         {error && (
           <div className="bg-red-500/20 border border-red-500/30 backdrop-blur-md rounded-2xl p-4 mb-6">

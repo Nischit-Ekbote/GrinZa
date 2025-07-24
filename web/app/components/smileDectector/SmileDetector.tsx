@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, Play, Square, Zap, Smile, Trophy, Star } from 'lucide-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 interface BlendShape {
   categoryName: string;
@@ -217,7 +218,7 @@ const SmileDetector = ({ maxSmileScore, setMaxSmileScore, onClick }: SmileDetect
           video: {
             width: 640,
             height: 480,
-            frameRate: 30
+            frameRate: 60
           }
         });
 
@@ -241,138 +242,128 @@ const SmileDetector = ({ maxSmileScore, setMaxSmileScore, onClick }: SmileDetect
   }, [webcamRunning, faceLandmarker, predictWebcam]);
 
   const getSmileLevel = (score: number) => {
-    if (score < 20) return { label: 'Neutral', color: 'text-slate-400', glow: 'shadow-slate-500/20' };
-    if (score < 40) return { label: 'Slight Smile', color: 'text-cyan-400', glow: 'shadow-cyan-500/30' };
-    if (score < 60) return { label: 'Happy', color: 'text-blue-400', glow: 'shadow-blue-500/40' };
-    if (score < 80) return { label: 'Big Smile', color: 'text-purple-400', glow: 'shadow-purple-500/40' };
-    return { label: 'Pure Joy!', color: 'text-pink-400', glow: 'shadow-pink-500/50' };
+    if (score < 20) return { label: 'Neutral', color: 'text-purple-300', icon: '😐' };
+    if (score < 40) return { label: 'Slight Smile', color: 'text-purple-400', icon: '🙂' };
+    if (score < 60) return { label: 'Happy', color: 'text-purple-500', icon: '😊' };
+    if (score < 80) return { label: 'Big Smile', color: 'text-purple-600', icon: '😄' };
+    return { label: 'Pure Joy!', color: 'text-purple-300', icon: '🤩' };
   };
 
   const smileLevel = getSmileLevel(currentSmileScore);
-  const maxSmileLevel = getSmileLevel(maxSmileScore);
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-6 py-12 relative z-10">
-
-        {error && (
-          <div className="mb-12 max-w-4xl mx-auto">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl blur" />
-              <div className="relative p-6 bg-slate-800/90 backdrop-blur-xl rounded-2xl border border-amber-500/30">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-amber-500/20 rounded-lg">
-                    <Zap className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <p className="text-amber-100 text-lg">{error}</p>
-                </div>
-              </div>
-            </div>
+    <div className="w-full h-full">
+       <div className='flex justify-between p-6 absolute top-0 left-0 w-full z-10'>
+              <h1 className='relative z-10'>Capture Smile</h1>
+              <WalletMultiButton/>
           </div>
-        )}
-
-        <div className="max-w-7xl mx-auto">
-          <div className="flex gap-8 justify-center" >
-
-            {/* Main Video Section */}
-            <div className=" space-y-8 w-1/2">
-
-              {/* Control Panel */}
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-800/40 to-slate-700/40 rounded-3xl blur-xl" />
-                <div className="relative">
-
-                </div>
-              </div>
-
-              {/* Video Display */}
-              <div className="relative w-full max-w-2xl mx-auto rounded-3xl overflow-hidden shadow-lg">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-800/30 to-slate-900/30 rounded-3xl blur-xl" />
-                <div className="relative bg-slate-800/40 backdrop-blur-2xl rounded-3xl p-8 border border-slate-700/50">
-                  <div className="relative w-full aspect-video">
-                    <canvas
-                      ref={canvasRef}
-                      className="absolute top-0 left-0  opacity-0 pointer-events-none"
-                    />
-                    <video
-                      ref={videoRef}
-                      className={` rounded-2xl object-cover bg-slate-900/50 ${webcamRunning ? 'block' : 'hidden'} ${captureAnimation ? 'ring-4 ring-cyan-400/50 animate-pulse' : ''}`}
-                      style={{ transform: 'scaleX(-1)' }}
-                      autoPlay
-                      playsInline
-                      muted
-                    />
-
-                    {!webcamRunning && (
-                      <div className="absolute w-full h-full bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl flex items-center justify-center backdrop<Camera/>-blur-sm border border-slate-700/30">
-                        <div className="text-center flex flex-col items-center gap-2">
-                          <Camera size={70}/>
-                          <h3 className="text-3xl font-bold text-white mt-3">Ready to Detect</h3>
-                          <p className="text-lg text-slate-400">Click "Start" to begin AI-powered smile analysis</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Live Score Overlay */}
-                    {webcamRunning && (
-                      <div className="absolute top-6 left-6 right-6 ">
-                        <div className="relative">
-                          <div className="absolute backdrop-blur-sm rounded-2xl" />
-                          <div className="relative p-3 flex flex-col rounded-2xl w-fit justify-center items-center bg-slate-800/50   backdrop-blur-sm">
-                            <div className="flex items-center justify-between mb-4 ">
-
-                              <div className={`px-4 py-2 rounded-full text-sm font-bold ${smileLevel.color} bg-slate-800/50 backdrop-blur`}>
-                                {smileLevel.label}
-                              </div>
-                            </div>
-                              <span className={`text-2xl font-bold w-fit text-white`}>{currentSmileScore.toFixed(1)}%</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Capture Button */}
-              <div className="relative flex gap-8">
-                <div className="absolute inset-0 rounded-2xl blur-xl  " />
-                <button
-                  onClick={toggleWebcam}
-                  disabled={isLoading}
-                  className={`relative w-1/2  px-8 rounded font-bold text-lg transition-all duration-500 group overflow-hidden ${webcamRunning
-                      ? 'bg-gradient-to-r from-red-500/90 to-pink-500/90 hover:from-red-400 hover:to-pink-400 text-white'
-                      : 'bg-gradient-to-r from-cyan-500/90 to-blue-500/90 hover:from-cyan-400 hover:to-blue-400 text-white'
-                    } disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 hover:shadow-2xl ${webcamRunning ? 'hover:shadow-red-500/25' : 'hover:shadow-cyan-500/25'}`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative flex items-center justify-center gap-4">
-                    {webcamRunning ? (
-                      <>
-                        Stop Detection
-                      </>
-                    ) : (
-                      <>
-                        {isLoading ? 'Initializing AI Model...' : 'Start '}
-                      </>
-                    )}
-                  </div>
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  className="relative w-1/2 py-4 px-8 bg-gradient-to-r from-blue-500/90 to-purple-500/90 hover:from-blue-400 hover:to-purple-400 rounded font-bold text-xl text-white transition-all duration-500 shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden"
-                  disabled={!webcamRunning}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative flex items-center justify-center gap-4">
-                    Capture
-                  </div>
-                </button>
-              </div>
+      <div className='w-full h-screen flex justify-center items-center'>
+        {/* Error Message */}
+      {error && (
+        <div className="mb-8">
+          <div className="bg-yellow-900/20 backdrop-blur-sm border border-yellow-500/30 rounded-2xl p-4">
+            <div className="flex items-center gap-3">
+              <Zap className="w-5 h-5 text-yellow-400" />
+              <p className="text-yellow-200 text-sm">{error}</p>
             </div>
-
           </div>
         </div>
+      )}
+
+      <div className=" space-y-6 flex flex-col items-center justify-center">
+        {/* Video Display */}
+        <div className="relative">
+          <div className=" rounded-2xl overflow-hidden ">
+            <canvas
+              ref={canvasRef}
+              className="absolute top-0 left-0 opacity-0 pointer-events-none"
+            />
+            <video
+              ref={videoRef}
+              className={`w-full h-full object-cover bg-purple-900/20 ${
+                webcamRunning ? 'block' : 'hidden'
+              } ${captureAnimation ? 'ring-4 ring-purple-400/50 animate-pulse' : ''}`}
+              style={{ transform: 'scaleX(-1)' }}
+              autoPlay
+              playsInline
+              muted
+            />
+
+            {!webcamRunning && (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center flex flex-col items-center gap-4">
+                    <Camera className="w-16 h-16 text-purple-300" />
+                  <h3 className="text-2xl font-bold text-white ">Camera Ready</h3>
+                  <p className="text-purple-200">Click "Start Detection" to begin</p>
+                </div>
+              </div>
+            )}
+
+            {/* Live Score Overlay */}
+            {webcamRunning && (
+              <div className="absolute top-4 right-4">
+                <div className="bg-purple-900/80 backdrop-blur-sm border border-purple-400/30 rounded-xl p-4 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-2xl">{smileLevel.icon}</span>
+                    <span className="text-sm font-medium text-purple-200">{smileLevel.label}</span>
+                  </div>
+                  <div className="text-2xl font-bold text-white">
+                    {currentSmileScore.toFixed(1)}%
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Control Buttons */}
+        <div className="flex gap-4 relative z-10 w-full justify-center">
+          <button
+            onClick={toggleWebcam}
+            disabled={isLoading}
+            className={`flex-1 py-3 max-w-1/2 rounded font-semibold text-lg transition-all duration-300 ${
+              webcamRunning
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-[#512da8] hover:bg-purple-700 text-white'
+            } disabled:opacity-50 disabled:cursor-not-allowed transform`}
+          >
+            <div className="flex items-center justify-center gap-3">
+              {webcamRunning ? (
+                <>
+                  <Square className="w-5 h-5" />
+                  Stop
+                </>
+              ) : (
+                <>
+                  {isLoading ? 'Initializing...' : 'Start'}
+                </>
+              )}
+            </div>
+          </button>
+
+          {webcamRunning && <button
+            onClick={handleSubmit}
+            disabled={ maxSmileScore <= 60}
+            className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800/50 disabled:text-purple-400 rounded font-semibold text-lg text-white transition-all duration-300 transform disabled:transform-none disabled:cursor-not-allowed"
+          >
+            <div className="flex items-center justify-center gap-3">
+              Capture Smile
+            </div>
+          </button>}
+        </div>
+
+        {/* Helper Text */}
+        {webcamRunning && (
+          <div className="text-center">
+            <p className="text-purple-200 text-sm">
+              {maxSmileScore <= 60 
+                ? `Keep smiling! You need a score above 60 to capture.`
+                : `Great smile! Score: ${maxSmileScore.toFixed(1)} - Ready to capture! 🎉`
+              }
+            </p>
+          </div>
+        )}
+      </div>
       </div>
     </div>
   );

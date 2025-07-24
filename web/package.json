@@ -17,14 +17,18 @@
     "@solana/wallet-adapter-react-ui": "^0.9.39",
     "@solana/wallet-adapter-wallets": "^0.19.37",
     "@solana/web3.js": "^1.98.2",
+    "@tabler/icons-react": "^3.34.1",
     "axios": "^1.10.0",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.525.0",
+    "motion": "^12.23.7",
     "next": "15.4.2",
     "nft.storage": "^7.2.0",
     "pinata": "^2.4.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "sonner": "^2.0.6"
+    "sonner": "^2.0.6",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

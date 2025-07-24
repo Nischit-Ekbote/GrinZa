@@ -52,59 +52,37 @@ export default function Home() {
         }
     };
 
-    if (!hasMounted || !wallet?.publicKey) {
-  return (
-    <div className="min-h-screen bg-black flex items-center justify-center text-white p-4 box-border relative z-10">
-      <div className="text-center">
-        <Wallet className="w-24 h-24 text-purple-300 mx-auto mb-6" />
-        <h1 className="text-4xl text-white mb-4">Smile</h1>
-        <p className="text-purple-200 text-lg mb-8">Please connect your wallet to continue</p>
-        <WalletMultiButton />
-      </div>
-    </div>
-  );
-}
+    if (!wallet?.publicKey) {
+        return (
+            <div className="min-h-screen flex items-center justify-center text-white p-4 box-border relative z-10">
+                <div className="text-center">
+                    <Wallet className="w-24 h-24 text-purple-300 mx-auto mb-6" />
+                    <h1 className="text-4xl text-white mb-4">Smile</h1>
+                    <p className="text-purple-200 text-lg mb-8">Please connect your wallet to continue</p>
+                    <WalletMultiButton />
+                </div>
+            </div>
+        );
+    }
 
 
     return (
         <div className="min-h-screen bg-black text-white p-4 box-border">
-            <div className="flex justify-end items-center mb-6">
-                <WalletMultiButton />
-            </div>
-            
+
             {/* Step 1: Smile Detection */}
-            { steps === 0 && 
+            {steps === 0 &&
                 <>
-                    <SmileDetector 
-                maxSmileScore={maxSmileScore}
-                setMaxSmileScore={setMaxSmileScore}
-                onClick={onClick}
-            />
-
-            {/* Show smile score and captured image */}
-            <div className="p-4">
-                <p>Current Max Smile Score: {maxSmileScore.toFixed(1)}</p>
-
-                {capturedImage && (
-                    <div className="mt-4">
-                        <h3 className="text-lg font-bold mb-2">Captured Smile:</h3>
-                        <img 
-                            src={capturedImage} 
-                            alt="Captured smile" 
-                            className="max-w-sm rounded-lg border-2 border-white/20"
-                        />
-                    </div>
-                )}
-            </div>
+                    <SmileDetector
+                        maxSmileScore={maxSmileScore}
+                        setMaxSmileScore={setMaxSmileScore}
+                        onClick={onClick}
+                    />
                 </>
             }
 
             {/* Step 2: NFT Creation */}
             {steps === 1 && (
-                <div className="mt-6">
-
-                    <CreateNft data={data} />
-                </div>
+                <CreateNft data={data} />
             )}
         </div>
     );
