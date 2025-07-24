@@ -29,6 +29,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+       <link
+          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+          rel="stylesheet"
+        />
       <Toaster richColors={true} />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
