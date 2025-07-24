@@ -87,7 +87,9 @@ export async function POST(req: Request) {
       .vote(isUpvote)
       .accounts({
         voter,
-      })
+        poll: pollPda,
+        voteRecord: voteRecordPda,
+      } as any)
       .instruction();
 
     const tx = new Transaction().add(ix);
