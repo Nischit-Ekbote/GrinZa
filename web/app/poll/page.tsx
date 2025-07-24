@@ -28,13 +28,10 @@ const GrinzaApp: React.FC = () => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [polls, setPolls] = useState<Poll[]>([]);
-  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
-  const [newPollNftMint, setNewPollNftMint] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [votingPollId, setVotingPollId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
 
-  // Filter polls based on selected filter
   const filteredPolls = useMemo(() => {
     switch (filter) {
       case 'active':
@@ -48,7 +45,6 @@ const GrinzaApp: React.FC = () => {
     }
   }, [polls, filter, wallet]);
 
-  // Integrated vote function with API call
   const vote = async (pollId: string, isUpvote: boolean) => {
     if (!wallet || !wallet.publicKey || !wallet.signTransaction) {
       console.error('Wallet not connected or missing sign capability');
@@ -65,7 +61,7 @@ const GrinzaApp: React.FC = () => {
     setLoading(true);
 
     try {
-      // Call the API to get the transaction
+
       const response = await fetch('/api/vote', {
         method: 'POST',
         headers: {
@@ -84,19 +80,13 @@ const GrinzaApp: React.FC = () => {
         throw new Error(data.error || 'Vote transaction failed');
       }
 
-      // Deserialize and sign the transaction
       const transaction = Transaction.from(Buffer.from(data.transaction));
       const signedTransaction = await wallet.signTransaction(transaction);
       
-      // Send the signed transaction
       const signature = await connection.sendRawTransaction(signedTransaction.serialize());
       
-      // Wait for confirmation
       await connection.confirmTransaction(signature, 'confirmed');
-      
-      console.log('Vote transaction confirmed:', signature);
 
-      // Update the UI optimistically
       setPolls(prev => prev.map(p => {
         if (p.id === pollId) {
           return {
@@ -110,7 +100,6 @@ const GrinzaApp: React.FC = () => {
         return p;
       }));
 
-      // Optionally refresh poll data from backend
       await fetchPolls();
 
     } catch (err : any) {
@@ -134,7 +123,6 @@ const GrinzaApp: React.FC = () => {
       }
       console.error('Vote failed:', err);
       
-      // Show err to user (you might want to add a toast notification here)
       alert(`Vote failed: ${err instanceof err ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
@@ -148,7 +136,7 @@ const GrinzaApp: React.FC = () => {
     setLoading(true);
     
     try {
-      // Call your close poll API here
+
       const response = await fetch('/api/close-poll', {
         method: 'POST',
         headers: {
@@ -193,8 +181,6 @@ const GrinzaApp: React.FC = () => {
       const response = await fetch(`/api/polls${walletParam}`);
       const data = await response.json();
       if (data.success) {
-        console.log('Fetched polls:', data.polls.length, 'polls');
-        // Log any polls with missing images
         const pollsWithoutImages = data.polls.filter((poll: Poll) => !poll.nftImage);
         if (pollsWithoutImages.length > 0) {
           console.warn('Polls without images:', pollsWithoutImages.map((p: Poll) => ({ id: p.id, nftMint: p.nftMint, nftName: p.nftName })));
@@ -231,7 +217,6 @@ const GrinzaApp: React.FC = () => {
     fetchPolls();
   }, []);
 
-  // Refresh polls when wallet connects/disconnects
   useEffect(() => {
     if (wallet) {
       fetchPolls();
@@ -308,20 +293,17 @@ const GrinzaApp: React.FC = () => {
                           error: e
                         });
                         const target = e.target as HTMLImageElement;
-                        // Try alternative IPFS gateways
                         if (poll.nftImage.includes('gateway.pinata.cloud')) {
                           const hash = poll.nftImage.split('/ipfs/')[1];
                           if (hash && !target.src.includes('ipfs.io')) {
-                            console.log('Trying alternative gateway: ipfs.io');
                             target.src = `https://ipfs.io/ipfs/${hash}`;
                             return;
                           }
                         }
-                        // Final fallback to placeholder
                         target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzc0MTUxIi8+CjxwYXRoIGQ9Ik0xMDAgNzBWMTMwTTcwIDEwMEgxMzAiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPHN2Zz4K';
                       }}
                       onLoad={() => {
-                        console.log('✅ Successfully loaded image for poll:', poll.id, poll.nftMint);
+                        console.log('Successfully loaded image for poll:', poll.id, poll.nftMint);
                       }}
                     />
                   ) : (

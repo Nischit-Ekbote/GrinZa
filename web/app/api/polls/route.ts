@@ -8,17 +8,15 @@ const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 const program = getProgram();
 const metaplex = Metaplex.make(connection);
 
-// In-memory cache for NFT metadata (in production, use Redis or similar)
 const metadataCache = new Map<string, {
   name: string;
   image: string;
   cachedAt: number;
 }>();
 
-// Rate limiting: delay between requests
 let lastMetadataFetch = 0;
-const RATE_LIMIT_DELAY = 500; // 500ms between requests
-const CACHE_DURATION = 60 * 60 * 1000; // 1 hour cache
+const RATE_LIMIT_DELAY = 500; 
+const CACHE_DURATION = 60 * 60 * 1000; 
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -26,19 +24,15 @@ async function fetchNFTMetadataWithRateLimit(nftMint: string) {
   const cacheKey = nftMint;
   const now = Date.now();
   
-  // Check cache first
   const cached = metadataCache.get(cacheKey);
   if (cached && (now - cached.cachedAt) < CACHE_DURATION) {
-    console.log(`📄 Using cached metadata for ${nftMint}`);
     return { name: cached.name, image: cached.image };
   }
 
   try {
-    // Rate limiting: ensure minimum delay between requests
     const timeSinceLastFetch = now - lastMetadataFetch;
     if (timeSinceLastFetch < RATE_LIMIT_DELAY) {
       const waitTime = RATE_LIMIT_DELAY - timeSinceLastFetch;
-      console.log(`⏳ Rate limiting: waiting ${waitTime}ms for ${nftMint}`);
       await delay(waitTime);
     }
     
@@ -50,13 +44,11 @@ async function fetchNFTMetadataWithRateLimit(nftMint: string) {
     let nftName = nft.name || "";
     let nftImage = "";
 
-    // Fetch metadata JSON with timeout and error handling
     if (nft.uri) {
       try {
-        console.log(`🔍 Fetching metadata for ${nftMint} from ${nft.uri}`);
         
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        const timeout = setTimeout(() => controller.abort(), 10000);
         
         const response = await fetch(nft.uri, {
           signal: controller.signal,
@@ -73,7 +65,6 @@ async function fetchNFTMetadataWithRateLimit(nftMint: string) {
             const meta = await response.json();
             nftName = nft.name || meta.name || "";
             nftImage = meta.image || "";
-            console.log(`✅ Successfully fetched metadata for ${nftMint}`);
           } else {
             console.warn(`⚠️ Non-JSON content type for ${nftMint}: ${contentType}`);
             nftName = nft.name || "";
@@ -95,7 +86,6 @@ async function fetchNFTMetadataWithRateLimit(nftMint: string) {
       nftName = nft.name || "";
     }
 
-    // Cache the result
     metadataCache.set(cacheKey, {
       name: nftName,
       image: nftImage,
@@ -107,10 +97,8 @@ async function fetchNFTMetadataWithRateLimit(nftMint: string) {
   } catch (error: any) {
     console.error(`❌ Error fetching NFT metadata for ${nftMint}:`, error.message);
     
-    // Return cached data if available, even if expired
     const cached = metadataCache.get(cacheKey);
     if (cached) {
-      console.log(`📄 Using expired cache for ${nftMint} due to error`);
       return { name: cached.name, image: cached.image };
     }
     
@@ -124,13 +112,10 @@ export async function GET(req: Request) {
   
   try {
     const polls = await program.account.poll.all();
-    console.log(`🔍 Processing ${polls.length} polls`);
-    
-    // Process polls with rate limiting
+
     const enriched = [];
     
     for (const { publicKey, account } of polls) {
-      console.log(`📊 Processing poll ${publicKey.toBase58()}`);
       
       let hasVoted = false;
       let userVote: 'up' | 'down' | null = null;
@@ -146,11 +131,9 @@ export async function GET(req: Request) {
           hasVoted = true;
           userVote = voteRecord.isUpvote ? 'up' : 'down';
         } catch (err) {
-          // user hasn't voted
         }
       }
 
-      // Fetch NFT metadata with rate limiting
       const { name: nftName, image: nftImage } = await fetchNFTMetadataWithRateLimit(
         account.nftMint.toBase58()
       );
@@ -170,7 +153,6 @@ export async function GET(req: Request) {
       });
     }
 
-    console.log(`✅ Successfully processed ${enriched.length} polls`);
     return NextResponse.json({ success: true, polls: enriched });
     
   } catch (error: any) {
@@ -191,11 +173,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Missing wallet or nftMint" }, { status: 400 });
 
     const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-    const program = getProgram(); // your helper that returns Program<Grinza>
+    const program = getProgram(); 
     const walletPub = new PublicKey(wallet);
     const nftMintPub = new PublicKey(nftMint);
 
-    // Derive PDA
     const [pollPda] = PublicKey.findProgramAddressSync(
       [Buffer.from("poll"), nftMintPub.toBuffer()],
       program.programId
@@ -205,10 +186,8 @@ export async function POST(req: Request) {
       .initializePoll(nftMintPub)
       .accounts({
         authority: walletPub,
-        poll: pollPda,
-        systemProgram: SystemProgram.programId,
       })
-      .instruction(); // <== Just build instruction (not send)
+      .instruction(); 
 
     const tx = new Transaction().add(ix);
     tx.feePayer = walletPub;

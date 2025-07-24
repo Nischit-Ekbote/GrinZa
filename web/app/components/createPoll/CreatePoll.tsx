@@ -34,7 +34,6 @@ function CreatePoll() {
   const [error, setError] = React.useState<string>("");
   const [success, setSuccess] = React.useState<string>("");
 
-  // Function to fetch NFTs from wallet using your API
   const fetchNFTs = async (): Promise<void> => {
     if (!wallet) {
       setError("Please connect your wallet first");
@@ -49,8 +48,6 @@ function CreatePoll() {
         wallet: wallet.publicKey.toBase58(),
       });
 
-      console.log("Fetched NFTs:", response.data);
-      
       const { success, nfts: fetchedNfts, error: apiError } = response.data;
       
       if (!success) {
@@ -59,7 +56,6 @@ function CreatePoll() {
         return;
       }
 
-      // Transform the data to match our component's expected format
       const transformedNfts: NFT[] = fetchedNfts?.map((nft: NFT) => ({
         mint: nft.mint,
         name: nft.name || "Unnamed NFT",
@@ -114,16 +110,12 @@ function CreatePoll() {
       }
 
       const tx = Transaction.from(new Uint8Array(transaction));
-      // Sign the transaction
       const signedTx = await wallet.signTransaction(tx);
-      // Send it to Solana
       const txid = await connection.sendRawTransaction(signedTx.serialize());
       await connection.confirmTransaction(txid, "confirmed");
-      console.log("Poll created, txid:", txid);
-      
+
       setSuccess("🎉 Poll created successfully!");
       
-      // Reset form after delay
       setTimeout(() => {
         setNft("");
         setSelectedNftName("");
@@ -164,7 +156,7 @@ function CreatePoll() {
   }
 
   return (
-    <div className="min-h-screen bg-black p-6">
+    <div className="min-h-screen bg-black p-6 flex flex-col justify-center">
       <div className="max-w-4xl mx-auto">
         {/* Status Messages */}
         {error && (
@@ -180,15 +172,14 @@ function CreatePoll() {
         )}
 
         {/* Main Content Card */}
-        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 mb-8 border border-white/20">
+        <div className=" rounded-3xl p-8 mb-8">
           <div className="flex items-center space-x-3 mb-6">
-            <Sparkles className="w-8 h-8 text-purple-400" />
             <h2 className="text-2xl text-white">Poll Configuration</h2>
           </div>
 
           {/* NFT Selection Section */}
           <div className="mb-8">
-            <label className="block text-purple-200 text-sm font-medium mb-3">
+            <label className="block text-sm font-medium mb-3">
               Select NFT for Poll
             </label>
             
@@ -196,7 +187,7 @@ function CreatePoll() {
               <div className="bg-white/5 rounded-2xl p-6 border border-white/10 mb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-pink-400/10 rounded-xl flex items-center justify-center">
                       <Image className="w-6 h-6 text-white" />
                     </div>
                     <div>
@@ -215,8 +206,8 @@ function CreatePoll() {
             ) : (
               <div className="bg-white/5 rounded-2xl p-6 border border-white/10 border-dashed mb-4">
                 <div className="text-center">
-                  <Image className="w-12 h-12 text-purple-300 mx-auto mb-3 opacity-50" />
-                  <p className="text-purple-300 mb-2">No NFT selected</p>
+                  <Image className="w-12 h-12 text-purple-300 mx-auto mb-3" />
+                  <p className="text-white-300 mb-2">No NFT selected</p>
                   <p className="text-purple-400 text-sm">Choose an NFT from your wallet to create a poll</p>
                 </div>
               </div>
@@ -228,7 +219,6 @@ function CreatePoll() {
               className="w-full bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 font-semibold py-4 px-8 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
               type="button"
             >
-              <Plus className="w-5 h-5" />
               <span>{selectedNftName ? "Change NFT" : "Select NFT"}</span>
             </button>
           </div>

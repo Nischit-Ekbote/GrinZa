@@ -13,15 +13,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // Strip base64 prefix
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
-    const fileName = `smile-${Date.now()}.jpg`; // ✅ fixed string interpolation
+    const fileName = `smile-${Date.now()}.jpg`; 
 
-    // Create a File object from the buffer
     const file = new File([buffer], fileName, { type: 'image/jpeg' });
 
-    // Upload the image file with metadata
     const upload = await pinata.upload.public.file(file, {
       metadata: {
         name: fileName,
@@ -32,16 +29,13 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log(upload);
-    console.log('Upload successful:', upload);
-
     return NextResponse.json(
       {
         success: true,
         message: 'Image upload successful',
         data: {
           hash: upload.cid || upload.id,
-          url: `https://gateway.pinata.cloud/ipfs/${upload.cid || upload.id}`, // ✅ fixed string interpolation
+          url: `https://gateway.pinata.cloud/ipfs/${upload.cid || upload.id}`, 
           timestamp,
           score,
           fullResponse: upload,

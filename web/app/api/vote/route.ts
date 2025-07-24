@@ -14,7 +14,6 @@ export async function POST(req: Request) {
   try {
     const { wallet, nftMint, isUpvote } = await req.json();
     
-    // Validate input parameters
     if (!wallet || !nftMint || typeof isUpvote !== "boolean") {
       return NextResponse.json(
         { success: false, error: "Missing or invalid parameters" },
@@ -22,7 +21,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validate wallet address format
     let voter: PublicKey;
     try {
       voter = new PublicKey(wallet);
@@ -33,7 +31,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validate NFT mint address format
     let mint: PublicKey;
     try {
       mint = new PublicKey(nftMint);
@@ -44,10 +41,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get the program instance
     const program = getProgram(wallet);
 
-    // Derive PDAs
     const [pollPda] = PublicKey.findProgramAddressSync(
       [Buffer.from("poll"), mint.toBuffer()],
       program.programId
@@ -58,7 +53,6 @@ export async function POST(req: Request) {
       program.programId
     );
 
-    // Check if poll exists
     try {
       const pollAccount = await program.account.poll.fetch(pollPda);
       if (!pollAccount.isActive) {
@@ -74,37 +68,34 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if user has already voted
     try {
       await program.account.voteRecord.fetch(voteRecordPda);
       return NextResponse.json(
         { success: false, error: "User has already voted on this poll" },
         { status: 400 }
       );
-    } catch (error) {
-      // Vote record doesn't exist, which is what we want
+    } catch (error: any) {
+      if (!error.message.includes("Account does not exist")) {
+        return NextResponse.json(
+          { success: false, error: "Error checking vote record" },
+          { status: 500 }
+        );
+      }
     }
 
-    // Create the vote instruction
     const ix = await program.methods
       .vote(isUpvote)
       .accounts({
         voter,
-        poll: pollPda,
-        voteRecord: voteRecordPda,
-        systemProgram: SystemProgram.programId,
       })
       .instruction();
 
-    // Create and configure transaction
     const tx = new Transaction().add(ix);
     tx.feePayer = voter;
     
-    // Get latest blockhash
     const latestBlockhash = await connection.getLatestBlockhash();
     tx.recentBlockhash = latestBlockhash.blockhash;
 
-    // Serialize transaction for frontend signing
     const serializedTransaction = tx.serialize({ requireAllSignatures: false });
 
     return NextResponse.json({
@@ -116,7 +107,6 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("❌ Vote transaction error:", error);
     
-    // More specific error handling
     let errorMessage = "Vote transaction failed";
     
     if (error instanceof Error) {

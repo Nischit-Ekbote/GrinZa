@@ -34,7 +34,6 @@ function CreateNft({data} : {data: any}) {
 
             if (response.data.success) {
                 toast.success(`NFT created successfully`);
-                console.log('NFT Minted:', response.data);
             } else {
                 toast.error(`Failed to create NFT: ${response.data.error}`);
             }   
@@ -64,12 +63,13 @@ function CreateNft({data} : {data: any}) {
 
     return (
         <div className="w-full mx-auto">
-            <div className='flex justify-between p-6'>
+            <div className='flex justify-between p-6 absolute top-0 left-0 right-0'>
                           <h1 className='relative z-10'>Create NFT</h1>
                           <WalletMultiButton/>
                       </div>
             {/* Preview Section */}
-            <div className="bg-purple-900/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-6">
+            <div className="max-w-3xl h-[95vh] mx-auto px-6 py-8 space-y-6 h-[calc(100vh - 10px)] flex flex-col justify-center">
+                            <div className="bg-white-900/20 backdrop-blur-sm border-purple-500/30 rounded-2xl p-6">
                 <div className="flex gap-6 items-start">
                     {/* Image Preview */}
                     <div className="flex-shrink-0">
@@ -77,9 +77,9 @@ function CreateNft({data} : {data: any}) {
                             <img 
                                 src={data?.url} 
                                 alt="Smile Capture" 
-                                className="w-32 h-32 rounded-xl object-cover border border-purple-400/30"
+                                className="w-36 h-36 rounded-xl object-cover border border-purple-400/30"
                             />
-                            <div className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                            <div className="absolute -top-2 -right-2 bg-purple-600/50 text-white text-xs px-2 py-1 rounded-full font-semibold">
                                 {getScoreIcon(data?.score || 0)} {data?.score.toFixed(2) || 0}%
                             </div>
                         </div>
@@ -93,17 +93,17 @@ function CreateNft({data} : {data: any}) {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-purple-800/30 backdrop-blur-sm border border-purple-400/30 rounded-xl p-3">
+                            <div className="bg-purple-800/10 backdrop-blur-sm border border-purple-400/10 rounded-xl p-3">
                                 <div className="flex items-center gap-2 mb-1">
                                     <Trophy className="w-4 h-4 text-purple-300" />
                                     <span className="text-xs text-purple-200 font-medium">Smile Score</span>
                                 </div>
-                                <span className={`text-lg font-bold ${getScoreColor(data?.score || 0)}`}>
-                                    {data?.score || 0}%
+                                <span className={`text-lg font-bold `}>
+                                    {data?.score.toFixed(2) || 0}%
                                 </span>
                             </div>
 
-                            <div className="bg-purple-800/30 backdrop-blur-sm border border-purple-400/30 rounded-xl p-3">
+                            <div className="bg-purple-800/10 backdrop-blur-sm border border-purple-400/10 rounded-xl p-3">
                                 <div className="flex items-center gap-2 mb-1">
                                     <Calendar className="w-4 h-4 text-purple-300" />
                                     <span className="text-xs text-purple-200 font-medium">Captured</span>
@@ -115,10 +115,10 @@ function CreateNft({data} : {data: any}) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> 
 
             {/* Input Section */}
-            <div className="bg-purple-900/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-6 space-y-4">
+            <div className="bg-white-900/20 backdrop-blur-sm rounded-2xl p-6 space-y-4">
                 <div>
                     <label htmlFor="name" className="block text-lg font-semibold text-white mb-3">
                         NFT Name
@@ -129,7 +129,7 @@ function CreateNft({data} : {data: any}) {
                         value={name} 
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Enter a name for your smile NFT..."
-                        className="w-full px-4 py-3 bg-purple-800/30 backdrop-blur-sm border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400 transition-all duration-300"
+                        className="w-full px-4 py-4 bg-purple-800/10 backdrop-blur-sm border border-purple-400/10 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500/10 focus:border-purple-400 transition-all duration-300"
                     />
                 </div>
 
@@ -137,7 +137,7 @@ function CreateNft({data} : {data: any}) {
                 <button
                     onClick={handleSubmit}
                     disabled={isLoading || !name || !data?.url}
-                    className="w-full py-4 px-6 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800/50 disabled:text-purple-400 rounded-xl font-semibold text-lg text-white transition-all duration-300 transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed"
+                    className="w-full py-4 px-6 text-white bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800/50 bg-purple-800/50  rounded-xl font-semibold text-lg text-white transition-all duration-300 disabled:cursor-not-allowed"
                 >
                     <div className="flex items-center justify-center gap-3">
                         {isLoading ? (
@@ -147,19 +147,19 @@ function CreateNft({data} : {data: any}) {
                             </>
                         ) : (
                             <>
-                                <Star className="w-5 h-5" />
                                 Create Smile NFT
                             </>
                         )}
                     </div>
                 </button>
 
-                {data?.hash && (
+                {/* {data?.hash && (
                     <div className="bg-green-900/20 backdrop-blur-sm border border-green-500/30 rounded-xl p-4">
                         <p className="text-sm text-green-400 font-medium mb-1">Transaction Hash:</p>
                         <p className="text-xs text-green-200 font-mono break-all">{data.hash}</p>
                     </div>
-                )}
+                )} */}
+            </div>
             </div>
         </div>
     );

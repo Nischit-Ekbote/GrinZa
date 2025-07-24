@@ -15,20 +15,18 @@ export async function POST(req: Request) {
     const walletPub = new PublicKey(wallet.publicKey);
     const nftMintPub = new PublicKey(nftMint);
 
-    // Derive PDA for the poll
     const [pollPda] = PublicKey.findProgramAddressSync(
       [Buffer.from("poll"), nftMintPub.toBuffer()],
       program.programId
     );
 
-    // Build the close poll instruction
+
     const ix = await program.methods
       .closePoll()
       .accounts({
         authority: walletPub,
-        poll: pollPda,
       })
-      .instruction(); // <== Just build instruction (not send)
+      .instruction(); 
 
     const tx = new Transaction().add(ix);
     tx.feePayer = walletPub;

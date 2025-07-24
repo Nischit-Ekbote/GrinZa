@@ -7,7 +7,7 @@ const Page: React.FC = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden ">
-      <Link href={'https://github.com/Nischit-Ekbote/GrinZa'} className='flex py-2 gap-2 items-center absolute left-0 top-0 z-11 bg-gray-400 m-4 rounded px-4 text-black hover:bg-gray-700 hover:text-white transition-colors'>
+      <Link href={'https://github.com/Nischit-Ekbote/GrinZa'} target='blank' className='flex py-2 gap-2 items-center absolute left-0 top-0 z-11 bg-gray-400 m-4 rounded px-4 text-black hover:bg-gray-700 hover:text-white transition-colors'>
       <div className='p-1 bg-white rounded-full '>
         <Github size={15} className='text-black'/>
       </div>

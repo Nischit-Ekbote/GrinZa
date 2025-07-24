@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import { WalletContextProvider } from "./provider/WalletProvider";
 import '@solana/wallet-adapter-react-ui/styles.css';
 import { FloatingDockBar } from "./components/ui/FloatingDock";
-import { FloatingOrbs } from "./components/ui/Floating-orbs"; // ✅ Import here
+import { FloatingOrbs } from "./components/ui/Floating-orbs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

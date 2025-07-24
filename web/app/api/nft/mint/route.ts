@@ -92,16 +92,10 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log('🚀 Starting NFT creation process...');
-
-    console.log('📸 Uploading image to IPFS...');
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
     const imageBuffer = Buffer.from(base64Data, 'base64');
     const imageUri = await uploadFileToPinata(imageBuffer, `${name}.png`, 'image/png');
-    
-    console.log('✅ Image uploaded to IPFS:', imageUri);
 
-    console.log('📄 Creating and uploading metadata...');
     const metadata = {
       name,
       symbol: '',
@@ -128,13 +122,10 @@ export async function POST(req: Request) {
     };
 
     const metadataUri = await uploadJsonToPinata(metadata, name);
-    console.log('✅ Metadata uploaded to IPFS:', metadataUri);
 
-    console.log('⏳ Waiting for IPFS propagation...');
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     const userPublicKey = new PublicKey(user);
-    console.log('🪙 Minting NFT on Solana...');
 
     const { nft } = await metaplex.nfts().create({
       uri: metadataUri,
@@ -151,9 +142,6 @@ export async function POST(req: Request) {
         updateAuthority: keypair,
         newUpdateAuthority: new PublicKey(user),
     });
-
-
-    console.log('🎉 NFT minted successfully!');
     
     return NextResponse.json({
       success: true,

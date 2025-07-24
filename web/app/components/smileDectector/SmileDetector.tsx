@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, Play, Square, Zap, Smile, Trophy, Star } from 'lucide-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { toast } from 'sonner';
 
 interface BlendShape {
   categoryName: string;
@@ -195,7 +196,7 @@ const SmileDetector = ({ maxSmileScore, setMaxSmileScore, onClick }: SmileDetect
 
   const toggleWebcam = async () => {
     if (!faceLandmarker) {
-      console.log('Face landmarker not ready yet.');
+      toast.warning('Face landmarker not ready yet.');
       return;
     }
 
@@ -257,7 +258,7 @@ const SmileDetector = ({ maxSmileScore, setMaxSmileScore, onClick }: SmileDetect
               <h1 className='relative z-10'>Capture Smile</h1>
               <WalletMultiButton/>
           </div>
-      <div className='w-full h-screen flex justify-center items-center'>
+      <div className='w-full h-[90vh] flex justify-center items-center'>
         {/* Error Message */}
       {error && (
         <div className="mb-8">
@@ -330,7 +331,6 @@ const SmileDetector = ({ maxSmileScore, setMaxSmileScore, onClick }: SmileDetect
             <div className="flex items-center justify-center gap-3">
               {webcamRunning ? (
                 <>
-                  <Square className="w-5 h-5" />
                   Stop
                 </>
               ) : (

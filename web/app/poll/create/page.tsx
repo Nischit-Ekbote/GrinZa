@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function Page() {
     return (
         <div>
-            <div className='flex justify-between p-6'>
+            <div className='flex justify-between p-6 absolute top-0 left-0 right-0'>
                     <h1 className='relative z-10'><Link href={"/poll"}>Polls</Link> / Create</h1>
                     <WalletMultiButton/>
                   </div>

@@ -40,7 +40,7 @@ pub mod grinza {
         require!(poll.is_active, GrinzaError::PollClosed);
         require!(!vote_record.voted, GrinzaError::AlreadyVoted);
 
-        // Register vote
+
         if is_upvote {
             poll.upvotes += 1;
         } else {
@@ -51,7 +51,7 @@ pub mod grinza {
         vote_record.voter = ctx.accounts.voter.key();
         vote_record.voted = true;
         vote_record.is_upvote = is_upvote;
-        vote_record.bump = ctx.bumps.vote_record; // ✅ Fixed: Added missing bump
+        vote_record.bump = ctx.bumps.vote_record; 
 
         msg!("✅ Vote recorded by {:?}", ctx.accounts.voter.key());
         Ok(())
@@ -125,7 +125,7 @@ pub struct Poll {
 }
 
 impl Poll {
-    pub const SIZE: usize = 32 + 32 + 4 + 4 + 1 + 8 + 1; // ✅ Fixed: 82 bytes
+    pub const SIZE: usize = 32 + 32 + 4 + 4 + 1 + 8 + 1; 
 }
 
 #[account]

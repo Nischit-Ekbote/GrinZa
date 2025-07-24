@@ -41,7 +41,6 @@ function VotePoll() {
       const signedTx = await wallet.signTransaction(tx);
       const txId = await connection.sendRawTransaction(signedTx.serialize());
 
-      console.log('✅ Vote submitted! Tx ID:', txId);
       alert(`Vote submitted!\nTransaction ID: ${txId}`);
     } catch (error) {
       console.error('❌ Vote failed:', error);

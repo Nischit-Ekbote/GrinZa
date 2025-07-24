@@ -40,10 +40,8 @@ export default function Home() {
             });
 
             if (response.data.success) {
-                console.log('Smile score and image submitted successfully:', maxSmileScore);
                 toast.success('Smile captured successfully! 📸');
-                console.log('Response data:', response.data.data);
-                setData(response.data.data); // <-- Will contain image URL + attributes
+                setData(response.data.data);
                 setSteps(1);
             }
         } catch (error) {
