@@ -122,14 +122,29 @@ function CreatePoll() {
         setSuccess("");
       }, 3000);
     } catch (err : any) {
-      const message = err?.message || err?.toString() || ""
-      if (message.includes("already been processed") || message.includes("custom program error: 0x0")) {
-        toast.success("Poll already created for this NFT!");
-        setSuccess("Poll already created for this NFT!");
-        return
-      }
-      console.error("Error creating poll:", error);
-      setError("Failed to create poll. Please try again.");
+      const message = err?.message || err?.toString() || "";
+
+  if (
+    message.includes("already been processed") ||
+    message.includes("custom program error: 0x0")
+  ) {
+    toast.success("Poll already created for this NFT!");
+    setSuccess("Poll already created for this NFT!");
+    return;
+  }
+
+  if (
+    message.includes(
+      "Attempt to debit an account but found no record of a prior credit"
+    )
+  ) {
+    toast.error("Not enough SOL. Try airdropping some to your wallet.");
+    setError("Insufficient SOL. Please airdrop and try again.");
+    return;
+  }
+
+  console.error("Error creating poll:", err);
+  setError("Failed to create poll. Please try again.");
     } finally {
       setCreatingPoll(false);
     }
@@ -156,8 +171,8 @@ function CreatePoll() {
   }
 
   return (
-    <div className="min-h-screen bg-black p-6 flex flex-col justify-center">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-black p-6 flex flex-col justify-center items-center">
+      <div className="md:w-3xl w-fit">
         {/* Status Messages */}
         {error && (
           <div className="bg-red-500/20 border border-red-500/30 backdrop-blur-md rounded-2xl p-4 mb-6">
@@ -172,13 +187,13 @@ function CreatePoll() {
         )}
 
         {/* Main Content Card */}
-        <div className=" rounded-3xl p-8 mb-8">
+        <div className=" rounded-3xl p-8 mb-8 w-full">
           <div className="flex items-center space-x-3 mb-6">
             <h2 className="text-2xl text-white">Poll Configuration</h2>
           </div>
 
           {/* NFT Selection Section */}
-          <div className="mb-8">
+          <div className="mb-4">
             <label className="block text-sm font-medium mb-3">
               Select NFT for Poll
             </label>
@@ -216,7 +231,7 @@ function CreatePoll() {
             <button
               onClick={openNFTSelector}
               disabled={!wallet}
-              className="w-full bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 font-semibold py-4 px-8 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
+              className="w-full bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 font-semibold py-4 px-8 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
               type="button"
             >
               <span>{selectedNftName ? "Change NFT" : "Select NFT"}</span>
@@ -227,7 +242,7 @@ function CreatePoll() {
           <button
             onClick={handleCreatePoll}
             disabled={!wallet || !nft || creatingPoll}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center space-x-3"
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-8 rounded transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center space-x-3"
             type="button"
           >
             {creatingPoll ? (

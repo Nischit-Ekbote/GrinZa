@@ -7,6 +7,7 @@
   import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
   import { getDate } from '../utils/getDate';
   import Link from 'next/link';
+import AirdropButton from '../components/ui/AirDropButton';
 
   type Poll = {
     id: string;
@@ -121,6 +122,14 @@
         }));
           return
         }
+        if (
+            message.includes(
+              "Attempt to debit an account but found no record of a prior credit"
+            )
+          ) {
+            toast.error("Not enough SOL. Try airdropping some to your wallet.");
+            return;
+          }
         console.error('Vote failed:', err);
         
         alert(`Vote failed: ${err instanceof err ? err.message : 'Unknown error'}`);
@@ -232,7 +241,10 @@
       <div className="min-h-screen bg-black">
         <div className='flex justify-between p-6'>
           <h1 className='relative z-10'>Polls</h1>
-          <WalletMultiButton/>
+          <div className="flex items-center space-x-4">
+                                  <AirdropButton/>
+                              <WalletMultiButton/>
+                              </div>
         </div>
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Controls */}
