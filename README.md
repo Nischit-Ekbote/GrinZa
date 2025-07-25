@@ -20,7 +20,7 @@ Grinza is a decentralized application (dApp) on **Solana** that lets users upvot
 
 ## 🚀 Demo
 
-[🌐 Live Demo (if hosted)](https://grinza.vercel.app)  
+[🌐 Live Demo ](https://grin-za.vercel.app/)  
 📹 Coming soon: GIF walkthrough
 
 ---
